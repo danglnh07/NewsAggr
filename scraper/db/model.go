@@ -20,7 +20,7 @@ type Article struct {
 	SourceID      uint           `json:"source_id"`
 	Source        Source         `json:"source" gorm:"foreignKey:SourceID"`
 	Title         string         `json:"title"`
-	Url           string         `json:"url"` // The article URL
+	Url           string         `json:"url" gorm:"unique"` // The article URL
 	Image         sql.NullString `json:"image"`
 	PublishedDate string         `json:"published_date"`
 }
