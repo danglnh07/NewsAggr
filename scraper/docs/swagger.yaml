@@ -1,0 +1,278 @@
+basePath: /
+definitions:
+  api.ArticleResponse:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      published_date:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  api.CreateSourceRequest:
+    properties:
+      category:
+        type: string
+      link:
+        type: string
+      provider:
+        type: string
+    required:
+    - category
+    - link
+    - provider
+    type: object
+  api.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  api.SourceResponse:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      provider:
+        type: string
+    type: object
+  api.UpdateSourceRequest:
+    properties:
+      category:
+        type: string
+      link:
+        type: string
+      provider:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is the API for RSS Scraper service
+  title: RSS Scraper API
+  version: "1.0"
+paths:
+  /api/articles:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of articles with their details
+      parameters:
+      - description: Page number
+        in: query
+        name: page_id
+        required: true
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.ArticleResponse'
+            type: array
+        "500":
+          description: Failed to list articles
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: List articles
+      tags:
+      - articles
+  /api/articles/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a single article along with its source information
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.ArticleResponse'
+        "404":
+          description: Article not found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Failed to get article
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get an article by ID
+      tags:
+      - articles
+  /api/sources:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of news sources
+      parameters:
+      - description: Page number
+        in: query
+        name: page_id
+        required: true
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.SourceResponse'
+            type: array
+        "500":
+          description: Failed to list sources
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: List news sources
+      tags:
+      - sources
+    post:
+      consumes:
+      - application/json
+      description: Add a new news source to the database
+      parameters:
+      - description: Source details
+        in: body
+        name: source
+        required: true
+        schema:
+          $ref: '#/definitions/api.CreateSourceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SourceResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Failed to create source
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Create a new news source
+      tags:
+      - sources
+  /api/sources/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an existing news source by ID
+      parameters:
+      - description: Source ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Source not found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Failed to delete source
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Delete a news source
+      tags:
+      - sources
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a single news source from the database using its ID
+      parameters:
+      - description: Source ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SourceResponse'
+        "404":
+          description: Source not found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Failed to get source
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get a news source by ID
+      tags:
+      - sources
+    put:
+      consumes:
+      - application/json
+      description: Update details of an existing news source by ID
+      parameters:
+      - description: Source ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated source details
+        in: body
+        name: source
+        required: true
+        schema:
+          $ref: '#/definitions/api.UpdateSourceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SourceResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "404":
+          description: Source not found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Failed to update source
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Update a news source
+      tags:
+      - sources
+swagger: "2.0"
