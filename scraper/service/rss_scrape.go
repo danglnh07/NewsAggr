@@ -56,10 +56,18 @@ func (scraper *RssScraper) Scrape(source db.Source) error {
 	}
 
 	// Add all articles into database
-	if len(articles) != 0 {
-		result := scraper.queries.DB.CreateInBatches(&articles, len(articles))
+	for _, article := range articles {
+		result := scraper.queries.DB.Where("url = ?", article.Url).First(&db.Article{})
 		if result.Error != nil {
-			return result.Error
+			// If this article not exist in database, we insert them into database
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				result = scraper.queries.DB.Create(&article)
+				if result.Error != nil {
+					return result.Error
+				}
+			}
+
+			// If this article already exists, do nothing
 		}
 	}
 
